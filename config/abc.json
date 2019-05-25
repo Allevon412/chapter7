@@ -1,6 +1,6 @@
 [
   {
-    "module": "dirbuster"
+    "module": "dirlister"
   },
   {
     "module": "environment"
