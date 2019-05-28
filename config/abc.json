@@ -6,6 +6,6 @@
     "module": "environment"
   },
   {
-    "module": "keylogger"
+    "module": "Keylogger"
   }
 ]
