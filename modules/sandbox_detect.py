@@ -12,6 +12,8 @@ keystrokes = 0
 mouse_clicks = 0
 double_clicks = 0
 
+print("inside the sandbox_detect module")
+
 
 class LASTINPUTINFO(ctypes.Structure):
     _fields_ = [("cbSize", ctypes.c_uint),
