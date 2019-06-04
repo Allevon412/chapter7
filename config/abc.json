@@ -10,5 +10,8 @@
   },
   {
     "module": "screenshotter"
+  },
+  {
+    "module": "sandbox_detect"
   }
 ]
