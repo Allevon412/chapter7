@@ -45,7 +45,7 @@ def get_mouse_press(event):
 
     mouse_clicks += 1
     keypress_time = time.time()
-    detection()
+    detection(event)
 
     return True
 
@@ -57,7 +57,7 @@ def get_key_press(event):
     if event.Ascii >= 32 and event.Ascii < 127:
         keystrokes += 1
         keypress_time = time.time()
-        detection()
+        detection(event)
 
     return True
 
@@ -90,15 +90,17 @@ def detect_sandbox():
 
     # create and register a hook manager
     kl = pyHook.HookManager()
-    kl.SubscribeKeyDown(get_key_press)
-    kl.SubscribeMouseAllButtonsDown(get_mouse_press)
+    kl.KeyDown = get_key_press
+    kl.MouseLeftDown = get_mouse_press
+    kl.MouseMiddleDown = get_mouse_press
+    kl.MouseRightDown = get_mouse_press
 
     kl.HookKeyboard()
     kl.HookMouse()
     win32gui.PumpMessages()
 
 
-def detection():
+def detection(event):
     global mouse_clicks
     global keystrokes
     global keypress_time
@@ -116,31 +118,30 @@ def detection():
 
     # if we hit our threshold lets' bail out
     if last_input >= max_input_threshold:
-        print("too much input")
         sys.exit(1)
 
     while not detection_complete:
 
         if keypress_time is not None and previous_timestamp is not None:
-            # calculate the time between double clicks
-            elapsed = keypress_time - previous_timestamp
+            if hasattr(event, 'Wheel'):
+                # calculate the time between double clicks
+                elapsed = keypress_time - previous_timestamp
 
-            # the user double clicked
-            if elapsed <= double_click_threshold:
-                double_clicks += 1
-                if first_double_click is None:
-                    # grab the timestamp of the first double click
-                    first_double_click = time.time()
-                    return
+                # the user double clicked
+                if elapsed <= double_click_threshold:
+                    double_clicks += 1
+                    if first_double_click is None:
+                        # grab the timestamp of the first double click
+                        first_double_click = time.time()
+                        return
 
-                else:
-                    # did they try to emulate a rapid succession of clicks?
-                    if double_clicks == max_double_clicks:
-                        if keypress_time - first_double_click <= (max_double_clicks * double_click_threshold):
-                            print("too many double clicks")
-                            sys.exit(1)
+                    else:
+                        # did they try to emulate a rapid succession of clicks?
+                        if double_clicks == max_double_clicks:
+                            if keypress_time - first_double_click <= (max_double_clicks * double_click_threshold):
+                                sys.exit(1)
 
-            # we are happy there's enough user input
+                # we are happy there's enough user input
             if keystrokes >= max_keystrokes and double_clicks >= max_double_clicks and mouse_clicks >= max_mouse_clicks:
                 ctypes.windll.user32.PostQuitMessage(0)
                 return
@@ -151,6 +152,8 @@ def detection():
         elif keypress_time is not None:
             previous_timestamp = keypress_time
             return
+
+
 def main():
     detect_sandbox()
     return("We are okay!")
