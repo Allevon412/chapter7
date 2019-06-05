@@ -66,7 +66,7 @@ def get_key_press(event):
     global mouse_clicks
     global keystrokes
     global keypress_time
-    print(str(event.Ascii))
+    
     if event.Ascii >= 32 and event.Ascii < 127:
         keystrokes += 1
         keypress_time = time.time()
