@@ -169,6 +169,3 @@ def detection(event):
 def run(**args):
     detect_sandbox()
     return "We are okay!"
-
-
-run()
