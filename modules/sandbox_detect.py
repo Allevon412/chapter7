@@ -37,6 +37,7 @@ def get_last_input():
 
     return elapsed
 
+
 def get_mouse_press(event):
     global mouse_clicks
     global keystrokes
@@ -46,8 +47,9 @@ def get_mouse_press(event):
     keypress_time = time.time()
     detection()
 
-def get_key_press(event):
+    return True
 
+def get_key_press(event):
     global mouse_clicks
     global keystrokes
     global keypress_time
@@ -57,7 +59,7 @@ def get_key_press(event):
         keypress_time = time.time()
         detection()
 
-    return None
+    return True
 
 
 def detect_sandbox():
@@ -95,6 +97,7 @@ def detect_sandbox():
     kl.HookMouse()
     win32gui.PumpMessages()
 
+
 def detection():
     global mouse_clicks
     global keystrokes
@@ -110,8 +113,6 @@ def detection():
     global double_clicks
     global max_keystrokes
     global max_mouse_clicks
-
-
 
     # if we hit our threshold lets' bail out
     if last_input >= max_input_threshold:
@@ -141,8 +142,8 @@ def detection():
 
             # we are happy there's enough user input
             if keystrokes >= max_keystrokes and double_clicks >= max_double_clicks and mouse_clicks >= max_mouse_clicks:
-                print("We are ok!")
-                sys.exit(0)
+                ctypes.windll.user32.PostQuitMessage(0)
+                return
             else:
                 previous_timestamp = keypress_time
                 return
@@ -150,5 +151,8 @@ def detection():
         elif keypress_time is not None:
             previous_timestamp = keypress_time
             return
+def main():
+    detect_sandbox()
+    return("We are okay!")
 
-detect_sandbox()
+main()
