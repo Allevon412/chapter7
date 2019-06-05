@@ -154,8 +154,6 @@ def detection(event):
             return
 
 
-def main():
+def run(**args):
     detect_sandbox()
     return("We are okay!")
-
-main()
