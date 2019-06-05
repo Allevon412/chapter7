@@ -2,7 +2,6 @@ import ctypes
 import win32gui
 import pyHook
 import win32clipboard
-import random
 import time
 import sys
 
