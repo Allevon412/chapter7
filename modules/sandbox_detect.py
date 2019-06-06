@@ -12,7 +12,16 @@ kernel32 = ctypes.windll.kernel32
 keystrokes = 0
 mouse_clicks = 0
 double_clicks = 0
-
+max_keystrokes = random.randint(10, 25)
+max_mouse_clicks = random.randint(5, 25)
+double_clicks = 0
+max_double_clicks = 10
+double_click_threshold = 0.250  # in seconds
+first_double_click = None
+average_mousetime = 0
+max_input_threshold = 30000  # in milliseconds
+previous_timestamp = None
+detection_complete = False
 
 class LASTINPUTINFO(ctypes.Structure):
     _fields_ = [("cbSize", ctypes.c_uint),
@@ -37,6 +46,7 @@ def get_last_input():
     return elapsed
 
 def threader(hookDevice):
+    global k2
     if hookDevice == "keyboard":
         # create and register a hook manager
         k2 = pyHook.HookManager()
@@ -66,49 +76,38 @@ def get_key_press(event):
     global mouse_clicks
     global keystrokes
     global keypress_time
-    
+
     if event.Ascii >= 32 and event.Ascii < 127:
         keystrokes += 1
         keypress_time = time.time()
         detection(event)
-        
+
     return True
 
 
 def detect_sandbox():
     print("[*] inside the sandbox_detect module")
+
     global max_keystrokes
-    max_keystrokes = random.randint(10, 25)
     global max_mouse_clicks
-    max_mouse_clicks = random.randint(5, 25)
     global double_clicks
-    double_clicks = 0
     global max_double_clicks
-    max_double_clicks = 10
     global double_click_threshold
-    double_click_threshold = 0.250  # in seconds
     global first_double_click
-    first_double_click = None
-
     global average_mousetime
-    average_mousetime = 0
     global max_input_threshold
-    max_input_threshold = 30000  # in milliseconds
-
     global previous_timestamp
-    previous_timestamp = None
     global detection_complete
-    detection_complete = False
     global last_input
+
     last_input = get_last_input()
     global k2
-    list = []
-    list.append("keyboard")
-    list.append("mouse")
-    for hookDevice in list:
+
+    devices = ["keyboard", "mouse"]
+
+    for hookDevice in devices:
         t = threading.Thread(target=threader, args=(hookDevice,))
         t.start()
-
 
 
 def detection(event):
